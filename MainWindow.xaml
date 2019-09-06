@@ -1,0 +1,341 @@
+﻿<Window x:Class="MoskvinWorkers.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:MoskvinWorkers"
+        mc:Ignorable="d"
+        Title="Synchronizer"         
+        Height="685" 
+        Width="1000" 
+        Left="10"
+        Top="10"
+        WindowState="Normal" FontSize="13">
+    <Window.Resources>
+        <Style x:Key="linkStyleForFile" TargetType="{x:Type TextBlock}">
+            <Setter Property="Opacity" Value="0" />
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding ElementName=stackPanFile, Path=IsMouseOver}" Value="True">
+                    <Setter Property="Opacity" Value="1" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+        <Style x:Key="linkStyle" TargetType="{x:Type TextBlock}" >
+            <Setter Property="Opacity" Value="0" />
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding ElementName=stackpanelka, Path=IsMouseOver}" Value="True">
+                    <Setter Property="Opacity" Value="1"/>
+                    <Setter Property="Height" Value="48"/>
+                </DataTrigger>
+                <!--
+                <EventTrigger RoutedEvent="MouseEnter" >
+                    <BeginStoryboard>
+                        <Storyboard>
+                            <DoubleAnimation Storyboard.TargetProperty="Opacity" From="0" To="1" Duration="0:0:0.1" AutoReverse="False" />
+                        </Storyboard>
+                    </BeginStoryboard>
+                </EventTrigger>
+                <EventTrigger RoutedEvent="MouseLeave" >
+                    <BeginStoryboard>
+                        <Storyboard>
+                            <DoubleAnimation Storyboard.TargetProperty="Opacity" From="1" To="0" Duration="0:0:0.5" AutoReverse="False" />
+                        </Storyboard>
+                    </BeginStoryboard>
+                </EventTrigger>
+            -->
+                <!-- Сразу показывает объект
+                <DataTrigger Binding="{Binding ElementName=borderPath, Path=IsMouseOver}" Value="True">
+                    <Setter Property="Visibility" Value="Visible"/>
+                </DataTrigger>
+                -->
+            </Style.Triggers>
+        </Style>
+    </Window.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="455*"/>
+            <RowDefinition Height="100"/>
+        </Grid.RowDefinitions>
+        <Menu Background="#ebead8" Height="20" FontFamily="Times New Roman" FontSize="13" VerticalAlignment="Top" BorderBrush="Black" BorderThickness="1">
+            <MenuItem Header="Файл" >
+                <MenuItem Header="Новый" ToolTip="Добавить новый файл для копирования." Click="btnSelectFile_Click" />
+                <MenuItem Header="Редактировать" ToolTip="Редактировать файл для копирования." Click="btnEditFile_Click" />
+                <MenuItem Name="menuRemoveFile" Header="Удалить" ToolTip="Удалить из списка файл для копирования." Click="menuRemoveFile_Click" />
+                <MenuItem Header="Выход" ToolTip="Выйти из программы." Click="btnExit_Click" />
+            </MenuItem>
+            <MenuItem Header="Папка">
+                <MenuItem Header="Добавить папку" ToolTip="Добавить папку в список синхронизаций" Click="btnAddFolder_Click" />
+            </MenuItem>
+            <MenuItem Header="Синхронизация">
+                <MenuItem Name="menuDoSync" Header="Синхронизовать" ToolTip="Начать синхронизацию" Click="btnSync_Click" />
+                <MenuItem Name="menuAddSyncPath" Header="Добавить путь" ToolTip="Добавить путь для синхронизации." Click="menuAddSyncPath_Click" />
+                <MenuItem Name="menuClearList" Header="Очистить список" ToolTip="Удаляет все файлы в списке синхронизации" Click="menuClearList_Click" />
+            </MenuItem>
+            <MenuItem Header="Настройки" >
+                <MenuItem Name="menuLastSession" Header="Загружать последнюю сессию" IsCheckable="True" IsChecked="{Binding LoadLastSession, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" ToolTip="Добавить путь для копирования." />
+            </MenuItem>
+            <MenuItem Header="Помощь" >
+                <MenuItem Name="menuHelp" Header="Справка"  >
+                    <MenuItem.Icon>
+                        <Image Margin="0,2,0,2" Source="Image/png/16/Help.png" />
+                    </MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Name="menuAbout" Header="О программе" ToolTip="Просмотреть информацию об этой программе" Click="menuAbout_Click">
+                    <MenuItem.Icon>
+                        <Image Margin="0,2,0,2" Source="Image/png/16/Information.png"/>
+                    </MenuItem.Icon>
+                </MenuItem>
+            </MenuItem>
+        </Menu>
+
+
+
+        <TabControl Margin="2,50,2,0"  Background="Silver" BorderBrush="Black" BorderThickness="1">
+            <TabItem Header="Файлы" Grid.Row="0">
+                <DataGrid Name="grid" Margin="0,0,0,8" AutoGenerateColumns="False" AlternatingRowBackground="White" IsReadOnly="True" CanUserAddRows="True" SelectionMode="Extended" RowDetailsVisibilityMode="VisibleWhenSelected"
+                          AllowDrop="True"
+                          PreviewDragEnter="text_PreviewDragEnter"
+                          PreviewDragOver="text_PreviewDragEnter"
+                          PreviewDrop="text_PreviewDrop"
+                          >
+                    <DataGrid.Resources>
+                        <Style TargetType="{x:Type DataGrid}">
+                            <EventSetter Event="MouseLeftButtonDown" Handler="Empty_SingleClick" />
+                            <EventSetter Event="MouseDoubleClick" Handler="Empty_DoubleClick" />
+                            <Setter Property="RowBackground" Value="#FF9AC2F1" />
+                        </Style>
+                        <Style TargetType="{x:Type DataGridColumnHeader}">
+                            <Setter Property="Background" Value="#FF3479DE" >
+                                <!-- Value="#2B78B9" /> -->
+                            </Setter>
+                            <Setter Property="Foreground" Value="White" />
+                            <Setter Property="BorderBrush" Value="Black" />
+                            <Setter Property="BorderThickness" Value="1" />
+                            <Setter Property="Height" Value="25" />
+                            <Setter Property="FontWeight" Value="SemiBold" />
+                            <Setter Property="HorizontalContentAlignment" Value="Center" />
+                        </Style>
+                        <Style TargetType="{x:Type DataGridCell}">
+                            <Style.Triggers>
+                                <Trigger Property="DataGridCell.IsSelected" Value="True">
+                                    <Setter Property="Background" >
+                                        <Setter.Value>
+                                            <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                                                <GradientStop Color="#FF54A1BD" Offset="0.075"/>
+                                                <GradientStop Color="#FF1D1414" Offset="1"/>
+                                                <GradientStop Color="#FF87F587" Offset="0.983"/>
+                                            </LinearGradientBrush>
+                                        </Setter.Value>
+                                    </Setter>
+                                    <Setter Property="Foreground" Value="Black" />
+                                </Trigger>
+                            </Style.Triggers>
+                        </Style>
+                    </DataGrid.Resources>
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="№" Binding="{Binding Path=FileID, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Width="30">
+                            <DataGridTextColumn.ElementStyle>
+                                <Style>
+                                    <Setter Property="TextBlock.VerticalAlignment" Value="Center" />
+                                    <Setter Property="TextBlock.HorizontalAlignment" Value="Center" />
+                                </Style>
+                            </DataGridTextColumn.ElementStyle>
+                        </DataGridTextColumn>
+
+                        <DataGridTemplateColumn Header="Файлы" Width="100*" MinWidth="100">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <Grid Name="stackPanFile">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="60" />
+                                        </Grid.ColumnDefinitions>
+                                        <Image Source="{Binding FileTypeImage, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Grid.Column="0" HorizontalAlignment="Left" Height="16" Width="16"/>
+                                        <TextBlock Margin="20,0,0,0" Text="{Binding FileName, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" HorizontalAlignment="Left" Grid.Column="0" Height="20" TextAlignment="Center" />
+                                        <StackPanel Grid.Column="1" Orientation="Horizontal" >
+                                            <TextBlock Height="16">
+                                                <Hyperlink NavigateUri="http://www.google.com" RequestNavigate="Hyperlink_FileInfoNavigate" TextDecorations="{x:Null}">
+                                                    <TextBlock Name="tbInfo" Margin="5,0,0,0" Style="{StaticResource linkStyleForFile}" ToolTip="Узнать больше о файле.">
+                                                        <Image Source="Image/info.ico" Width="15" Height="15" />
+                                                    </TextBlock>
+                                                </Hyperlink>
+                                            </TextBlock>
+                                            <TextBlock Height="16">
+                                                <Hyperlink NavigateUri="http://www.google.com" RequestNavigate="Hyperlink_FileEditNavigate" TextDecorations="{x:Null}" >
+                                                    <TextBlock Name="tbEdit" Foreground="HotPink" Cursor="Hand" Margin="5,0,0,0" Style="{StaticResource linkStyleForFile}" ToolTip="Редактировать">
+                                                        <Image Source="Image/edit.ico" Width="15" Height="15" />
+                                                    </TextBlock>
+                                                </Hyperlink>
+                                            </TextBlock>
+                                            <TextBlock Height="16">
+                                                <Hyperlink Name="hyper" NavigateUri="http://www.google.com" RequestNavigate="Hyperlink_FileRemoveNavigate" TextDecorations="{x:Null}">
+                                                    <TextBlock Name="tbRemove" Margin="5,0,0,0" Style="{StaticResource linkStyleForFile}" ToolTip="Удалить">
+                                                        <Image Source="Image/delete.ico" Width="15" Height="15" />
+                                                    </TextBlock>
+                                                </Hyperlink>
+                                            </TextBlock>
+                                        </StackPanel>
+                                    </Grid>
+                                    <!--
+                                    <StackPanel Name="stackPanFile" Orientation="Horizontal" Background="Transparent">
+                                        <Image Source="{Binding FileTypeImage,  UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+                                        <TextBlock Margin="5,0" Text="{Binding FileName, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Height="20" TextAlignment="Center" />
+                                        <TextBlock Height="18">
+                                            <Hyperlink NavigateUri="http://www.google.com" RequestNavigate="Hyperlink_FileInfoNavigate" TextDecorations="{x:Null}">
+                                                <TextBlock Name="tbInfo" Margin="5,0,0,0" Style="{StaticResource linkStyleForFile}" ToolTip="Узнать больше о файле.">
+                                                  <Image Source="Image/info.ico" Width="16" Height="16" />
+                                                </TextBlock>
+                                            </Hyperlink> 
+                                        </TextBlock>
+                                        <TextBlock Height="18">
+                                            <Hyperlink NavigateUri="http://www.google.com" RequestNavigate="Hyperlink_FileEditNavigate" TextDecorations="{x:Null}">
+                                                <TextBlock Name="tbEdit" Foreground="HotPink" Cursor="Hand" Margin="5,0,0,0" Style="{StaticResource linkStyleForFile}" ToolTip="Редактировать">
+                                                  <Image Source="Image/edit.ico" Width="16" Height="16" />
+                                                </TextBlock>
+                                            </Hyperlink> 
+                                        </TextBlock>
+                                        <TextBlock Height="18">
+                                    <Hyperlink Name="hyper" NavigateUri="http://www.google.com" RequestNavigate="Hyperlink_FileRemoveNavigate" TextDecorations="{x:Null}">
+                                        <TextBlock Name="tbRemove" Margin="5,0,0,0" Style="{StaticResource linkStyleForFile}" ToolTip="Удалить">
+                                            <Image Source="Image/delete.ico" Width="16" Height="16" />
+                                        </TextBlock>
+                                    </Hyperlink>
+                                </TextBlock>
+                                    </StackPanel>
+                                    -->
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+
+                        <DataGridTemplateColumn Header="Пути" Width="200*">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <ListBox Name="sdv" ItemsSource="{Binding PathToCopy, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" HorizontalAlignment="Left" Width="Auto" BorderThickness="0" Background="Transparent" >
+                                        <ListBox.ItemsPanel>
+                                            <ItemsPanelTemplate>
+                                                <StackPanel IsItemsHost="True"/>
+                                            </ItemsPanelTemplate>
+                                        </ListBox.ItemsPanel>
+                                        <ListBox.ItemTemplate>
+                                            <DataTemplate>
+                                                <!-- Старый вид панели
+                                        <Border Name="borderPath" BorderBrush="Lime" BorderThickness="1" SnapsToDevicePixels="True" CornerRadius="3" Padding="3" Margin="3" Width="Auto">
+                                            <TextBlock Text="{Binding}">
+                                                <Hyperlink Name="hyperEdit" NavigateUri="http://www.google.com" RequestNavigate="Hyperlink_RequestEditNavigate" TextDecorations="{x:Null}">
+                                                    <TextBlock Name="tbEdit" Foreground="HotPink" Margin="5,0,0,0" Style="{StaticResource linkStyle}" ToolTip="Редактировать">
+                                                        <Image Source="Image/edit.ico" Width="16" Height="16" />
+                                                    </TextBlock>
+                                                </Hyperlink>
+                                                <Hyperlink Name="hyper" NavigateUri="http://www.google.com" RequestNavigate="Hyperlink_RequestNavigate" TextDecorations="{x:Null}">
+                                                    <TextBlock Name="tbRemove" Foreground="HotPink" Margin="10,0,0,0" Style="{StaticResource linkStyle}" ToolTip="Удалить">
+                                                        <Image Source="Image/delete.ico" Width="16" Height="16" />
+                                                    </TextBlock>
+                                                </Hyperlink>                                                
+                                            </TextBlock>
+                                        </Border>
+                                        -->
+                                                <StackPanel Name="stackpanelka" Orientation="Horizontal" Background="Transparent">
+                                                    <Border Name="borderPath" BorderBrush="DeepPink" BorderThickness="1" SnapsToDevicePixels="True" CornerRadius="3" Padding="3" Margin="3" Width="Auto">
+                                                        <TextBlock Text="{Binding}" />
+                                                    </Border>
+                                                    <TextBlock Height="18">
+                                            <Hyperlink NavigateUri="http://www.google.com" RequestNavigate="Hyperlink_SyncFileInfoNavigate" TextDecorations="{x:Null}">
+                                                <TextBlock Name="tbInfo" Margin="5,0,0,0" Style="{StaticResource linkStyle}" ToolTip="Узнать больше о файле.">
+                                                  <Image Source="Image/info.ico" Width="16" Height="16" />
+                                                </TextBlock>
+                                            </Hyperlink> 
+                                        </TextBlock>
+                                                    <TextBlock Height="18">
+                                                <Hyperlink Name="hyperEdit" NavigateUri="http://www.google.com" RequestNavigate="Hyperlink_RequestEditNavigate" TextDecorations="{x:Null}">
+                                                    <TextBlock Name="tbEdit" Foreground="HotPink" Margin="5,0,0,0" Style="{StaticResource linkStyle}" ToolTip="Редактировать">
+                                                        <Image Source="Image/edit.ico" Width="16" Height="16" />
+                                                    </TextBlock>
+                                                </Hyperlink>
+                                            </TextBlock>
+                                                    <TextBlock Height="18">
+                                                <Hyperlink Name="hyper" NavigateUri="http://www.google.com" RequestNavigate="Hyperlink_RequestRemoveNavigate" TextDecorations="{x:Null}">
+                                                    <TextBlock Name="tbRemove" Foreground="HotPink" Margin="5,0,0,0" Style="{StaticResource linkStyle}" ToolTip="Удалить">
+                                                        <Image Source="Image/delete.ico" Width="16" Height="16" />
+                                                    </TextBlock>
+                                                </Hyperlink>
+                                            </TextBlock>
+                                                </StackPanel>
+                                            </DataTemplate>
+                                        </ListBox.ItemTemplate>
+                                    </ListBox>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                    </DataGrid.Columns>
+                    <DataGrid.ItemContainerStyle>
+                        <Style TargetType="DataGridRow">
+                            <!--<EventSetter Event="MouseLeftButtonDown" Handler="Row_DoubleClick"/>-->
+                            <!--<EventSetter Event="MouseRightButtonDown" Handler="DataGridRow_MouseRightButtonDown" />-->
+                            <EventSetter Event="Selected" Handler="DataGridRow_Selected" />
+                            <EventSetter Event="Unselected" Handler="DataGridRow_Unselected" />
+                        </Style>
+                    </DataGrid.ItemContainerStyle>
+
+                    <DataGrid.RowDetailsTemplate>
+                        <DataTemplate>
+                            <Grid Height="20">
+                                <Grid.Background>
+                                    <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                                        <GradientStop Color="#ebead8" Offset="0.004"/>
+                                        <GradientStop Color="#ebead8" Offset="1"/>
+                                    </LinearGradientBrush>
+                                </Grid.Background>
+                                <Rectangle Fill="Transparent" Stroke="Black" StrokeThickness="1" StrokeDashCap="Round" StrokeDashArray="4 2"  />
+                                <TextBlock Text="Перетащите сюда папку, куда нужно скопировать этот файл" TextAlignment="Center" VerticalAlignment="Center" Width="Auto"/>
+                            </Grid>
+                        </DataTemplate>
+                    </DataGrid.RowDetailsTemplate>
+
+                </DataGrid>
+            </TabItem>
+        </TabControl>
+
+        <Button Name="btnSync" ToolTip="Начать синхронизацию" Click="btnSync_Click" Grid.Row="1" Height="70" Width="270" Margin="365,5,0,25" HorizontalAlignment="Left">
+            <StackPanel Orientation="Horizontal">
+                <Image Source="Image/refresh.ico" Width="24" Height="24"/>
+                <Label Content="Синхронизировать" FontWeight="Bold" FontSize="20" Foreground="Red"/>
+            </StackPanel>
+        </Button>
+
+        <Grid Height="25" Margin="0,20,0,0" VerticalAlignment="Top">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition />
+                <ColumnDefinition />
+                <ColumnDefinition />
+                <ColumnDefinition />
+            </Grid.ColumnDefinitions>
+            <Button Height="25" Grid.Column="0" ToolTip="Добавить файл в список для синхронизации." Click="btnAddFile_Click">
+                <StackPanel Orientation="Horizontal">
+                    <Image Source="Image/png/Document-Add.png" Width="20" Height="20"/>
+                    <Label Content="Выбрать файл" FontFamily="Calibri" Padding="0" VerticalContentAlignment="Center" Margin="5,0,0,0" />
+                </StackPanel>
+            </Button>
+            <Button Height="25" Grid.Column="1" ToolTip="Добавить папку в список для синхронизации." IsEnabled="True" Click="btnAddFolder_Click">
+                <StackPanel Orientation="Horizontal">
+                    <Image Source="Image/png/Folder-Add.png" Width="20" Height="20" />
+                    <Label Content="Указать папку" FontFamily="Calibri" Padding="0" VerticalContentAlignment="Center" Margin="5,0,0,0" />
+                </StackPanel>
+            </Button>
+
+            <Button Height="25" Grid.Column="2" ToolTip="Удалить выбранный(-ые) файл(-ы) из списка." IsEnabled="True" Click="menuRemoveFile_Click">
+                <StackPanel Orientation="Horizontal">
+                    <Image Source="Image/png/Folder-Delete.png" Width="20" Height="20"/>
+                    <Label Content="Удалить файлы из списка" FontFamily="Calibri" Padding="0" VerticalContentAlignment="Center" Margin="5,0,0,0" />
+                </StackPanel>
+            </Button>
+
+            <Button Height="25" Grid.Column="3" ToolTip="Очистить весь список синхронизаций." Click="menuClearList_Click">
+                <StackPanel Orientation="Horizontal">
+                    <Image Source="Image/delete.ico" Width="16" Height="16"/>
+                    <Label Content="Очистить весь список" FontFamily="Calibri" VerticalContentAlignment="Center" Padding="0" Margin="5,0,0,0" />
+                </StackPanel>
+            </Button>
+        </Grid>
+
+    </Grid>
+</Window>

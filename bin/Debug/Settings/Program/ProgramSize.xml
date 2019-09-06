@@ -1,0 +1,10 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Syncronizer>
+  <Window Name="MainWindow">
+    <Height>754</Height>
+    <Width>1382</Width>
+    <Left>258</Left>
+    <Top>246</Top>
+    <State>Maximized</State>
+  </Window>
+</Syncronizer>

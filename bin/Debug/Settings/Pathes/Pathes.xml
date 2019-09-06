@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Pathes>
+  <Files>
+    <File Name="" value="" />
+  </Files>
+  <Folders>
+    <Folder value="F:\\Папка для тестирования\\Test.xlsx">Для теста 1</Folder>
+    <Folder value="F:\\TestFolders\\Test.xlsx">Для теста 2</Folder>
+    <Folder value="P:\\Отдел проектирования\\Persons\\Selyakov\\FolderToTest\\Test.xlsx">Сетевой диск P</Folder>
+    <Folder value="P:\\Отдел проектирования\\Persons\\Selyakov\\Папочка моя\\Test.xlsx">Сетевой диск P(моя)</Folder>
+  </Folders>
+  <FTPS>
+    <FTP value="ftp://127.0.0.1/hellow.txt" login="" password="">Сайт Палитры</FTP>
+  </FTPS>  
+</Pathes>
+
+
